@@ -2,6 +2,12 @@ import { ApolloServer, UserInputError, gql } from "apollo-server";
 
 import { v1 as uuid } from "uuid";
 
+import axios from "axios";
+
+
+const PERSONS_URL = "http://localhost:3000/persons";
+
+
 const persons = [{
   name: "zack", phone: "0123456789", street: " st Ave", city: "city", id: "1"
 }, {
@@ -47,13 +53,20 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    personCount: () => persons.length, allPersons: (root, args) => {
-      if (!args.phone) return persons;
+    personCount: () => persons.length,
+
+    allPersons: async (root, args) => {
+
+      const { data: personsFromApi } = await axios.get(PERSONS_URL);
+      console.log(personsFromApi, "persons from api")
+      if (!args.phone) return personsFromApi;
 
       const byPhone = (person) => args.phone === "YES" ? person.phone : !person.phone;
 
-      return persons.filter(byPhone);
-    }, findPerson: (root, args) => {
+      return personsFromApi.filter(byPhone);
+    },
+
+    findPerson: (root, args) => {
       const { name } = args;
       return persons.find((person) => person.name === name);
     }
@@ -68,7 +81,7 @@ const resolvers = {
   },
 
   Mutation: {
-    addPerson: (root, args) => {
+    addPerson: async (root, args) => {
       if (persons.find((p) => p.name === args.name)) {
         throw new UserInputError("Name must be unique", {
           invalidArgs: args.name
@@ -92,9 +105,9 @@ const resolvers = {
         ...person, phone: args.phone
       };
 
-      persons[index] = updatePerson
+      persons[index] = updatePerson;
 
-      return updatePerson
+      return updatePerson;
 
 
     }

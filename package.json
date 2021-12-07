@@ -5,13 +5,15 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "json-server": "json-server --watch ./src/db.json"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "apollo-server": "^3.5.0",
+    "axios": "^0.24.0",
     "graphql": "^15.8.0",
     "uuid": "^8.3.2"
   },
